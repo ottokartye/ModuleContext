@@ -1,0 +1,17 @@
+{
+  "name": "modulecontext",
+  "version": "1.0.0",
+  "description": "A/B Testing module",
+  "main": "index.js",
+  "scripts": {
+    "test": "rm -fr ./dist;mkdir dist;tsc;mocha ./dist/test --recursive;"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.0.2",
+    "typescript": "^1.8.10"
+  }
+}
