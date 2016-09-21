@@ -1,6 +1,7 @@
 export interface IContext {
-    main: string;
     groups: string[];
+    setMain: (id: string) => boolean;
+    addGroup: (groupId: string) => IContext;
 }
 
 export interface IContextRule {

@@ -1,13 +1,9 @@
 import IContextFactory from './IContextFactory';
 import { IContext, IContextRule} from './IContext';
-
-class Context implements IContext {
-    main: string;
-    groups: string[];
-}
+import Context from './Context';
 
 class ContextFactory implements IContextFactory {
-    rules: IContextRule[] = new Array();
+    rules: IContextRule[];
 
     getContext(object: any): IContext {
         let context = new Context;
@@ -20,6 +16,9 @@ class ContextFactory implements IContextFactory {
     }
 
     addRule(rule: IContextRule) {
+        if (!this.rules) {
+            this.rules = new Array<IContextRule>();
+        }
         this.rules.push(rule);
     }
 }

@@ -1,30 +1,20 @@
 "use strict";
 const ContextFactory_1 = require('../lib/ContextFactory/ContextFactory');
+const Context_1 = require('../lib/ContextFactory/Context');
 const chai_1 = require('chai');
 describe('ContextFactory', () => {
     const youngMale = {
         id: 'youngMale',
         exec: (context) => {
-            if (context.main === undefined) {
-                context.main = 'male';
-            }
-            if (context.groups === undefined) {
-                context.groups = new Array();
-            }
-            context.groups.push('young');
-            return true;
+            context.setMain('male');
+            context.addGroup('young');
         }
     };
     const oldFather = {
         id: 'oldFather',
         exec: (context) => {
-            if (context.main === undefined) {
-                context.main = 'parent';
-            }
-            if (context.groups === undefined) {
-                context.groups = new Array();
-            }
-            context.groups.push('male', 'old', 'father');
+            context.setMain('father');
+            context.addGroup('male').addGroup('old').addGroup('father');
         }
     };
     it('should add ContextRule to ContextFactory', () => {
@@ -34,10 +24,9 @@ describe('ContextFactory', () => {
     });
     it('should return the Context for User object', () => {
         const context = ContextFactory_1.default.getContext({});
-        const testContext = {
-            main: 'male',
-            groups: ['young', 'male', 'old', 'father']
-        };
+        const testContext = new Context_1.default();
+        testContext.setMain('male');
+        testContext.addGroup('young').addGroup('male').addGroup('old').addGroup('father');
         chai_1.expect(context).to.be.eql(testContext);
     });
 });

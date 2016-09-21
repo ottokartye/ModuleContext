@@ -1,18 +1,17 @@
 "use strict";
-class Context {
-}
+const Context_1 = require('./Context');
 class ContextFactory {
-    constructor() {
-        this.rules = new Array();
-    }
     getContext(object) {
-        let context = new Context;
+        let context = new Context_1.default;
         this.rules.forEach((rule) => {
             rule.exec(context);
         });
         return context;
     }
     addRule(rule) {
+        if (!this.rules) {
+            this.rules = new Array();
+        }
         this.rules.push(rule);
     }
 }
