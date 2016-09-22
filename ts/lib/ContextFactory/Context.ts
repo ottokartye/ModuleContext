@@ -4,6 +4,10 @@ class Context implements IContext {
     private _main: string;
     public groups: string[];
 
+    constructor() {
+        this.groups = new Array<string>();
+    }
+
     public setMain(id: string): boolean {
         if (!this.main) {
             this._main = id;
@@ -17,9 +21,6 @@ class Context implements IContext {
     }
 
     public addGroup(groupId: string): Context {
-        if (!this.groups) {
-            this.groups = new Array<string>();
-        }
         this.groups.push(groupId);
         return this;
     }
