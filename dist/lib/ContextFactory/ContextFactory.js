@@ -1,6 +1,9 @@
 "use strict";
 const Context_1 = require('./Context');
 class ContextFactory {
+    constructor() {
+        this.rules = new Array();
+    }
     getContext(object) {
         let context = new Context_1.default;
         this.rules.forEach((rule) => {
@@ -9,10 +12,8 @@ class ContextFactory {
         return context;
     }
     addRule(rule) {
-        if (!this.rules) {
-            this.rules = new Array();
-        }
         this.rules.push(rule);
+        return this;
     }
 }
 var contextFactory = new ContextFactory;

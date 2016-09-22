@@ -1,7 +1,7 @@
 "use strict";
-const ContextFactory_1 = require('../lib/ContextFactory/ContextFactory');
-const Context_1 = require('../lib/ContextFactory/Context');
 const chai_1 = require('chai');
+const ContextFactory_1 = require('../../lib/ContextFactory/ContextFactory');
+const Context_1 = require('../../lib/ContextFactory/Context');
 describe('ContextFactory', () => {
     const youngMale = {
         id: 'youngMale',
@@ -17,7 +17,7 @@ describe('ContextFactory', () => {
             context.addGroup('male').addGroup('old').addGroup('father');
         }
     };
-    it('should add ContextRule to ContextFactory', () => {
+    it('should add ContextRules to ContextFactory', () => {
         ContextFactory_1.default.addRule(youngMale);
         ContextFactory_1.default.addRule(oldFather);
         chai_1.expect(ContextFactory_1.default.rules).to.have.length(2);

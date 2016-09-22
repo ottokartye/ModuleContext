@@ -4,7 +4,7 @@ interface IContextFactory {
     rules: IContextRule[];
     getContext: (object: any) => IContext;
 
-    addRule: (rule: IContextRule) => void;
+    addRule: (rule: IContextRule) => IContextFactory;
 }
 
 export default IContextFactory;
