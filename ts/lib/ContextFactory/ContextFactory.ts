@@ -6,7 +6,7 @@ class ContextFactory implements IContextFactory {
     rules: IContextRule[];
 
     constructor() {
-        this.rules = new Array<IContextRule>();
+        this.rules = [] as IContextRule[];
     }
 
     getContext(object: any): IContext {

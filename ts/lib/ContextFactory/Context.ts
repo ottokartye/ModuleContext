@@ -5,7 +5,7 @@ class Context implements IContext {
     public groups: string[];
 
     constructor() {
-        this.groups = new Array<string>();
+        this.groups = [];
     }
 
     public setMain(id: string): boolean {
