@@ -2,7 +2,7 @@
 const Context_1 = require('./Context');
 class ContextFactory {
     constructor() {
-        this.rules = new Array();
+        this.rules = [];
     }
     getContext(object) {
         let context = new Context_1.default;

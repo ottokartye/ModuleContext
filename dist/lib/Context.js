@@ -1,7 +1,7 @@
 "use strict";
 class Context {
     constructor() {
-        this.groups = new Array();
+        this.groups = [];
     }
     setMain(id) {
         if (!this.main) {
@@ -14,6 +14,7 @@ class Context {
         return this._main;
     }
     addGroup(groupId) {
+        console.log('adding ' + groupId);
         this.groups.push(groupId);
         return this;
     }

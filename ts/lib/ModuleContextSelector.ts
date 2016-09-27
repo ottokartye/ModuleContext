@@ -1,7 +1,7 @@
-/// <reference path="../../../typings/index.d.ts" />
+/// <reference path="../../typings/index.d.ts" />
 
 import IModuleContext from './IModuleContext';
-import {IContext} from '../ContextFactory/IContext';
+import {IContext} from './IContext';
 import IModuleContextSelector from './IModuleContextSelector';
 
 /**
@@ -10,7 +10,23 @@ import IModuleContextSelector from './IModuleContextSelector';
  * @param  {IContext} context
  */
 export function load(rules:IModuleContext[], context: IContext) {
-    let selectedRule = rules.find((rule) => {
+    // Check if context matches any rule
+    let selectedRule = findRule(rules, context);
+
+    if (!selectedRule) {
+        return;
+    }
+
+    let modules = require(selectedRule.module);
+
+    if (!!selectedRule.onLoadedModule) {
+        selectedRule.onLoadedModule.apply(selectedRule, modules);
+    }
+};
+
+export function findRule(rules: IModuleContext[], context: IContext) {
+
+    return rules.find((rule) => {
 
         let mainValidator: boolean = true,
             groupValidator: boolean = true;
@@ -45,16 +61,44 @@ export function load(rules:IModuleContext[], context: IContext) {
 
         return mainValidator && groupValidator;
     });
+}
 
-    if (!selectedRule) {
-        return;
+export let mainValidator = (rule: IModuleContext, context: IContext) => {
+    let mainValidator: boolean = true;
+
+    if (!!rule.main) {
+        if (rule.main instanceof Array) {
+            mainValidator = rule.main.indexOf(context.main) > -1;
+        } else {
+            mainValidator = rule.main === context.main;
+        }
     }
 
-    let modules = require(selectedRule.module);
+    return mainValidator;
+};
 
-    if (!!selectedRule.onLoadedModule) {
-        selectedRule.onLoadedModule.apply(selectedRule, modules);
+export let groupValidator = (rule: IModuleContext, context: IContext) => {
+
+    if (!!rule.groups) {
+            
+        // Check if all properties are set or only some
+        // Check if one property is set
+        if (!!rule.groups.one && !arrayContainsOne(context.groups, rule.groups.one)) {
+            return false;
+        }
+
+        // Check if all property is set
+        if (!!rule.groups.all && !arrayContainsAll(context.groups, rule.groups.all)) {
+            return false;
+        }
+
+        // Check if none property is set
+        if (!!rule.groups.none && !arrayContainsNone(context.groups, rule.groups.none)) {
+            return false;
+        }
+        return true;
     }
+    return false;
 };
 
 /**
@@ -63,10 +107,14 @@ export function load(rules:IModuleContext[], context: IContext) {
  * @param  {string[]} oneArray
  * @returns boolean
  */
-function arrayContainsOne(groups: string[], oneArray: string[]): boolean {
-    let currentElement = oneArray.find((value) => {
+export function arrayContainsOne(groups: string[], oneArray: string[]): boolean {
+    let currentElement;
+    
+    currentElement = oneArray.find((value) => {
         return (value in groups);
     });
+
+    console.log('returning ' + currentElement);
 
     return !!currentElement;
 }
@@ -77,7 +125,7 @@ function arrayContainsOne(groups: string[], oneArray: string[]): boolean {
  * @param  {string[]} allArray
  * @returns boolean
  */
-function arrayContainsAll(groups: string[], allArray: string[]): boolean {    
+export function arrayContainsAll(groups: string[], allArray: string[]): boolean {    
     let currentElement = allArray.find((value) => {
         return !(value in groups);
     });
@@ -91,7 +139,7 @@ function arrayContainsAll(groups: string[], allArray: string[]): boolean {
  * @param  {string[]} noneArray
  * @returns boolean
  */
-function arrayContainsNone(groups: string[], noneArray: string[]): boolean {
+export function arrayContainsNone(groups: string[], noneArray: string[]): boolean {
     let currentElement = noneArray.find((value) => {
         return (value in groups);
     });
