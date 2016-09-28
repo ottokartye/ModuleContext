@@ -4,6 +4,43 @@ import IModuleContext from './IModuleContext';
 import {IContext} from './IContext';
 import IModuleContextSelector from './IModuleContextSelector';
 
+export function mainValidator (rule: IModuleContext, context: IContext) {
+    let mainValidator: boolean = true;
+
+    if (!!rule.main) {
+        if (rule.main instanceof Array) {
+            mainValidator = rule.main.indexOf(context.main) > -1;
+        } else {
+            mainValidator = rule.main === context.main;
+        }
+    }
+
+    return mainValidator;
+};
+
+export function groupValidator (rule: IModuleContext, context: IContext) {
+
+    if (!!rule.groups) {
+            
+        // Check if all properties are set or only some
+        // Check if one property is set
+        if (!!rule.groups.one && !arrayContainsOne(context.groups, rule.groups.one)) {
+            return false;
+        }
+
+        // Check if all property is set
+        if (!!rule.groups.all && !arrayContainsAll(context.groups, rule.groups.all)) {
+            return false;
+        }
+
+        // Check if none property is set
+        if (!!rule.groups.none && !arrayContainsNone(context.groups, rule.groups.none)) {
+            return false;
+        }
+    }
+    return true;
+};
+
 /**
  * Load modules contained in IModuleContext if rules apply
  * @param  {IModuleContext[]} rules
@@ -28,78 +65,12 @@ export function findRule(rules: IModuleContext[], context: IContext) {
 
     return rules.find((rule) => {
 
-        let mainValidator: boolean = true,
-            groupValidator: boolean = true;
+        let mainValidatorResult: boolean = mainValidator(rule, context);
+        let groupValidatorResult: boolean = groupValidator(rule, context);
 
-        if (!!rule.main) {
-            if (rule.main instanceof Array) {
-                mainValidator = rule.main.indexOf(context.main) > -1;
-            } else {
-                mainValidator = rule.main === context.main;
-            }
-        }
-
-        if (!!rule.groups) {
-            
-            // Check if all properties are set or only some
-            // Check if one property is set
-            if (!!rule.groups.one && !arrayContainsOne(context.groups, rule.groups.one)) {
-                return false;
-            }
-
-            // Check if all property is set
-            if (!!rule.groups.all && !arrayContainsAll(context.groups, rule.groups.all)) {
-                return false;
-            }
-
-            // Check if none property is set
-            if (!!rule.groups.none && !arrayContainsNone(context.groups, rule.groups.none)) {
-                return false;
-            }
-            
-        }
-
-        return mainValidator && groupValidator;
+        return mainValidatorResult && groupValidatorResult;
     });
 }
-
-export let mainValidator = (rule: IModuleContext, context: IContext) => {
-    let mainValidator: boolean = true;
-
-    if (!!rule.main) {
-        if (rule.main instanceof Array) {
-            mainValidator = rule.main.indexOf(context.main) > -1;
-        } else {
-            mainValidator = rule.main === context.main;
-        }
-    }
-
-    return mainValidator;
-};
-
-export let groupValidator = (rule: IModuleContext, context: IContext) => {
-
-    if (!!rule.groups) {
-            
-        // Check if all properties are set or only some
-        // Check if one property is set
-        if (!!rule.groups.one && !arrayContainsOne(context.groups, rule.groups.one)) {
-            return false;
-        }
-
-        // Check if all property is set
-        if (!!rule.groups.all && !arrayContainsAll(context.groups, rule.groups.all)) {
-            return false;
-        }
-
-        // Check if none property is set
-        if (!!rule.groups.none && !arrayContainsNone(context.groups, rule.groups.none)) {
-            return false;
-        }
-        return true;
-    }
-    return false;
-};
 
 /**
  * Check if groups array contains at least one element from oneArray
@@ -111,10 +82,8 @@ export function arrayContainsOne(groups: string[], oneArray: string[]): boolean 
     let currentElement;
     
     currentElement = oneArray.find((value) => {
-        return (value in groups);
+        return groups.indexOf(value) > -1;
     });
-
-    console.log('returning ' + currentElement);
 
     return !!currentElement;
 }
@@ -127,10 +96,14 @@ export function arrayContainsOne(groups: string[], oneArray: string[]): boolean 
  */
 export function arrayContainsAll(groups: string[], allArray: string[]): boolean {    
     let currentElement = allArray.find((value) => {
-        return !(value in groups);
+        return groups.indexOf(value) === -1;
     });
 
-    return !currentElement;
+    if (currentElement) {
+        return false;
+    }
+
+    return true;
 }
 
 /**
@@ -141,54 +114,12 @@ export function arrayContainsAll(groups: string[], allArray: string[]): boolean 
  */
 export function arrayContainsNone(groups: string[], noneArray: string[]): boolean {
     let currentElement = noneArray.find((value) => {
-        return (value in groups);
+        return groups.indexOf(value) > -1;
     });
 
-    return !currentElement;
-}
-
-function arrayContainsAll_cached(groups: string[], allArray: string[]) {
-    let biggestArray;
-    let smallestArray;
-    if (groups.length < allArray.length) {
-        biggestArray = allArray;
-        smallestArray = groups;
-    } else {
-        biggestArray = groups;
-        smallestArray = allArray;
+    if (currentElement) {
+        return false;
     }
 
-    let hashCache = {};
-    biggestArray.forEach((value) => {
-        hashCache[value] = true;
-    });
-
-    let hasFind = smallestArray.find((value) => {
-        return !(value in hashCache)
-    });
-
-    return !hasFind;
-}
-
-function arrayContainsNone_cached(groups: string[], allArray: string[]) {
-    let biggestArray;
-    let smallestArray;
-    if (groups.length < allArray.length) {
-        biggestArray = allArray;
-        smallestArray = groups;
-    } else {
-        biggestArray = groups;
-        smallestArray = allArray;
-    }
-
-    let hashCache = {};
-    biggestArray.forEach((value) => {
-        hashCache[value] = true;
-    });
-
-    let hasFind = smallestArray.find((value) => {
-        return !(value in hashCache)
-    });
-
-    return !hasFind;
+    return true;
 }

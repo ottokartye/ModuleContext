@@ -1,5 +1,39 @@
 /// <reference path="../../typings/index.d.ts" />
 "use strict";
+function mainValidator(rule, context) {
+    let mainValidator = true;
+    if (!!rule.main) {
+        if (rule.main instanceof Array) {
+            mainValidator = rule.main.indexOf(context.main) > -1;
+        }
+        else {
+            mainValidator = rule.main === context.main;
+        }
+    }
+    return mainValidator;
+}
+exports.mainValidator = mainValidator;
+;
+function groupValidator(rule, context) {
+    if (!!rule.groups) {
+        // Check if all properties are set or only some
+        // Check if one property is set
+        if (!!rule.groups.one && !arrayContainsOne(context.groups, rule.groups.one)) {
+            return false;
+        }
+        // Check if all property is set
+        if (!!rule.groups.all && !arrayContainsAll(context.groups, rule.groups.all)) {
+            return false;
+        }
+        // Check if none property is set
+        if (!!rule.groups.none && !arrayContainsNone(context.groups, rule.groups.none)) {
+            return false;
+        }
+    }
+    return true;
+}
+exports.groupValidator = groupValidator;
+;
 /**
  * Load modules contained in IModuleContext if rules apply
  * @param  {IModuleContext[]} rules
@@ -20,65 +54,12 @@ exports.load = load;
 ;
 function findRule(rules, context) {
     return rules.find((rule) => {
-        let mainValidator = true, groupValidator = true;
-        if (!!rule.main) {
-            if (rule.main instanceof Array) {
-                mainValidator = rule.main.indexOf(context.main) > -1;
-            }
-            else {
-                mainValidator = rule.main === context.main;
-            }
-        }
-        if (!!rule.groups) {
-            // Check if all properties are set or only some
-            // Check if one property is set
-            if (!!rule.groups.one && !arrayContainsOne(context.groups, rule.groups.one)) {
-                return false;
-            }
-            // Check if all property is set
-            if (!!rule.groups.all && !arrayContainsAll(context.groups, rule.groups.all)) {
-                return false;
-            }
-            // Check if none property is set
-            if (!!rule.groups.none && !arrayContainsNone(context.groups, rule.groups.none)) {
-                return false;
-            }
-        }
-        return mainValidator && groupValidator;
+        let mainValidatorResult = mainValidator(rule, context);
+        let groupValidatorResult = groupValidator(rule, context);
+        return mainValidatorResult && groupValidatorResult;
     });
 }
 exports.findRule = findRule;
-exports.mainValidator = (rule, context) => {
-    let mainValidator = true;
-    if (!!rule.main) {
-        if (rule.main instanceof Array) {
-            mainValidator = rule.main.indexOf(context.main) > -1;
-        }
-        else {
-            mainValidator = rule.main === context.main;
-        }
-    }
-    return mainValidator;
-};
-exports.groupValidator = (rule, context) => {
-    if (!!rule.groups) {
-        // Check if all properties are set or only some
-        // Check if one property is set
-        if (!!rule.groups.one && !arrayContainsOne(context.groups, rule.groups.one)) {
-            return false;
-        }
-        // Check if all property is set
-        if (!!rule.groups.all && !arrayContainsAll(context.groups, rule.groups.all)) {
-            return false;
-        }
-        // Check if none property is set
-        if (!!rule.groups.none && !arrayContainsNone(context.groups, rule.groups.none)) {
-            return false;
-        }
-        return true;
-    }
-    return false;
-};
 /**
  * Check if groups array contains at least one element from oneArray
  * @param  {string[]} groups
@@ -88,10 +69,8 @@ exports.groupValidator = (rule, context) => {
 function arrayContainsOne(groups, oneArray) {
     let currentElement;
     currentElement = oneArray.find((value) => {
-        console.log('checking ' + value + ' in ' + groups);
-        return value in groups;
+        return groups.indexOf(value) > -1;
     });
-    console.log('returning ' + currentElement);
     return !!currentElement;
 }
 exports.arrayContainsOne = arrayContainsOne;
@@ -103,9 +82,12 @@ exports.arrayContainsOne = arrayContainsOne;
  */
 function arrayContainsAll(groups, allArray) {
     let currentElement = allArray.find((value) => {
-        return !(value in groups);
+        return groups.indexOf(value) === -1;
     });
-    return !currentElement;
+    if (currentElement) {
+        return false;
+    }
+    return true;
 }
 exports.arrayContainsAll = arrayContainsAll;
 /**
@@ -116,48 +98,11 @@ exports.arrayContainsAll = arrayContainsAll;
  */
 function arrayContainsNone(groups, noneArray) {
     let currentElement = noneArray.find((value) => {
-        return (value in groups);
+        return groups.indexOf(value) > -1;
     });
-    return !currentElement;
+    if (currentElement) {
+        return false;
+    }
+    return true;
 }
 exports.arrayContainsNone = arrayContainsNone;
-function arrayContainsAll_cached(groups, allArray) {
-    let biggestArray;
-    let smallestArray;
-    if (groups.length < allArray.length) {
-        biggestArray = allArray;
-        smallestArray = groups;
-    }
-    else {
-        biggestArray = groups;
-        smallestArray = allArray;
-    }
-    let hashCache = {};
-    biggestArray.forEach((value) => {
-        hashCache[value] = true;
-    });
-    let hasFind = smallestArray.find((value) => {
-        return !(value in hashCache);
-    });
-    return !hasFind;
-}
-function arrayContainsNone_cached(groups, allArray) {
-    let biggestArray;
-    let smallestArray;
-    if (groups.length < allArray.length) {
-        biggestArray = allArray;
-        smallestArray = groups;
-    }
-    else {
-        biggestArray = groups;
-        smallestArray = allArray;
-    }
-    let hashCache = {};
-    biggestArray.forEach((value) => {
-        hashCache[value] = true;
-    });
-    let hasFind = smallestArray.find((value) => {
-        return !(value in hashCache);
-    });
-    return !hasFind;
-}
