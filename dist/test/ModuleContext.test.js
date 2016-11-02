@@ -4,25 +4,7 @@ const ModuleContextSelector_1 = require('../lib/ModuleContextSelector');
 const ArrayValidators_1 = require('../lib/ArrayValidators');
 const Context_1 = require('../lib/Context');
 describe('ModuleContext', () => {
-    const moduleContext = {
-        main: 'male',
-        groups: {
-            one: ['parent'],
-            all: ['young', 'parent', 'rich'],
-            none: ['old']
-        },
-        module: ['sampleModuleName']
-    };
-    const context = new Context_1.default();
-    context.setMain('male');
-    context.addGroup('young').addGroup('parent').addGroup('rich');
-    it('should contain group items', () => {
-        chai_1.expect(context.groups).to.have.length(3);
-    });
-    it('should validate context.main', () => {
-        const mainValidatorResult = ModuleContextSelector_1.mainValidator(moduleContext, context);
-        chai_1.expect(mainValidatorResult).to.be.true;
-    });
+    // Testing array validations
     describe('arrayContainsOne', () => {
         it('should contain one entry', () => {
             const groups = ['young', 'poor', 'president'];
@@ -59,30 +41,40 @@ describe('ModuleContext', () => {
             chai_1.expect(arrayContainsOneResult).to.be.false;
         });
     });
-    describe('mainValidator', () => {
-        it('should pass main property validation', () => {
-            const result = ModuleContextSelector_1.mainValidator(moduleContext, context);
-            chai_1.expect(result).to.be.true;
-        });
-    });
-    describe('groupValidator', () => {
-        it('should pass group property validation', () => {
-            const result = ModuleContextSelector_1.groupValidator(moduleContext, context);
-            chai_1.expect(result).to.be.true;
-        });
-    });
-    describe('findRule', () => {
-        it('should return a rule which is valid for the currently passed context', () => {
-            const result = ModuleContextSelector_1.findRule([moduleContext], context);
-            chai_1.expect(result).to.be.eql({
+    // Sample context to check against ModuleContextSelector rules
+    const context = new Context_1.default();
+    context.setMain('male');
+    context.addGroup('young').addGroup('parent').addGroup('rich');
+    describe('adding rules to moduleContextSelector', () => {
+        it('should add rules', () => {
+            // Define new rules
+            const male = {
                 main: 'male',
                 groups: {
                     one: ['parent'],
                     all: ['young', 'parent', 'rich'],
                     none: ['old']
                 },
+                module: ['SayHello']
+            };
+            const female = {
+                main: 'female',
+                groups: {
+                    one: ['parent'],
+                    all: ['young', 'parent', 'poor'],
+                    none: ['old']
+                },
                 module: ['sampleModuleName']
-            });
+            };
+            ModuleContextSelector_1.default.addRule(male).addRule(female);
+            const result = ModuleContextSelector_1.default.getNumberOfRules();
+            chai_1.expect(result).to.be.equal(2);
+        });
+    });
+    describe('loading modules', () => {
+        it('should find a rule which matches the currently passed context and load the required module', () => {
+            const result = ModuleContextSelector_1.default.load(context);
+            chai_1.expect(result).to.be.true;
         });
     });
 });

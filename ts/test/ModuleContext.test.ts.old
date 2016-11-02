@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import ModuleContextSelector from '../lib/ModuleContextSelector';
+import { load, mainValidator, groupValidator, findRule } from '../lib/ModuleContextSelector';
 import { arrayContainsOne, arrayContainsAll, arrayContainsNone } from '../lib/ArrayValidators';
 import IModuleContext from '../lib/IModuleContext';
 import { IContext } from '../lib/IContext';
@@ -7,7 +7,29 @@ import Context from '../lib/Context';
 
 describe('ModuleContext', () => {
 
-    // Testing array validations
+    const moduleContext: IModuleContext = {
+        main: 'male',
+        groups: {
+            one: ['parent'],
+            all:['young','parent','rich'],
+            none: ['old']
+        },
+        module: ['sampleModuleName']
+    };
+
+    const context: IContext = new Context();
+    context.setMain('male');
+    context.addGroup('young').addGroup('parent').addGroup('rich');
+
+    it('should contain group items', () => {
+        expect(context.groups).to.have.length(3);
+    });
+
+    it('should validate context.main', () => {
+        const mainValidatorResult = mainValidator(moduleContext, context);
+        expect(mainValidatorResult).to.be.true;
+    }); 
+
     describe('arrayContainsOne', () => {
         it('should contain one entry', () => {
             const groups = ['young','poor','president'];
@@ -50,43 +72,32 @@ describe('ModuleContext', () => {
         });
     });
 
-    // Sample context to check against ModuleContextSelector rules
-    const context: IContext = new Context();
-    context.setMain('male');
-    context.addGroup('young').addGroup('parent').addGroup('rich');
+    describe('mainValidator', () => {
+        it('should pass main property validation', () => {
+            const result = mainValidator(moduleContext, context);
+            expect(result).to.be.true;
+        });
+    });
 
+    describe('groupValidator', () => {
+        it('should pass group property validation', () => {
+            const result = groupValidator(moduleContext, context);
+            expect(result).to.be.true;
+        });
+    });
 
-    describe('adding rules to moduleContextSelector', () => {
-        it('should add rules', () => {
-            // Define new rules
-            const male: IModuleContext = {
+    describe('findRule', () => {
+        it('should return a rule which is valid for the currently passed context', () => {
+            const result = findRule([moduleContext], context);
+            expect(result).to.be.eql({
                 main: 'male',
                 groups: {
                     one: ['parent'],
                     all:['young','parent','rich'],
                     none: ['old']
                 },
-                module: ['SayHello']
-            };
-            const female: IModuleContext = {
-                main: 'female',
-                groups: {
-                    one: ['parent'],
-                    all:['young','parent','poor'],
-                    none: ['old']
-                },
                 module: ['sampleModuleName']
-            };
-            ModuleContextSelector.addRule(male).addRule(female);
-            const result = ModuleContextSelector.getNumberOfRules();
-            expect(result).to.be.equal(2);
-        });
-    });
-
-    describe('loading modules', () => {
-        it('should find a rule which matches the currently passed context and load the required module', () => {
-            const result = ModuleContextSelector.load(context);
-            expect(result).to.be.true;
+            });
         })
     });
 });
