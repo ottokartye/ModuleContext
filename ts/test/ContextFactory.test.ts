@@ -4,7 +4,7 @@ import IContextFactory from '../lib/IContextFactory';
 import {IContext,IContextRule} from '../lib/IContext';
 import Context from '../lib/Context';
 
-describe.skip('ContextFactory', () => {
+describe('ContextFactory', () => {
 
     const youngMale: IContextRule = {
         id: 'youngMale',

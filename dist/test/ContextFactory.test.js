@@ -2,7 +2,7 @@
 const chai_1 = require('chai');
 const ContextFactory_1 = require('../lib/ContextFactory');
 const Context_1 = require('../lib/Context');
-describe.skip('ContextFactory', () => {
+describe('ContextFactory', () => {
     const youngMale = {
         id: 'youngMale',
         exec: (context) => {
