@@ -52,7 +52,7 @@ describe('ModuleContext', () => {
             const arrayContainsOneResult = ModuleContextSelector_1.arrayContainsNone(groups, ['young', 'parent', 'rich']);
             chai_1.expect(arrayContainsOneResult).to.be.true;
         });
-        it('should fail because there is one common element ', () => {
+        it('should contain a common element ', () => {
             const groups = ['young', 'single', 'poor'];
             const arrayContainsOneResult = ModuleContextSelector_1.arrayContainsNone(groups, ['young', 'parent']);
             chai_1.expect(arrayContainsOneResult).to.be.false;

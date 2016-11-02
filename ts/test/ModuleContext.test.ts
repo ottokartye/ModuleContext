@@ -64,7 +64,7 @@ describe('ModuleContext', () => {
             expect(arrayContainsOneResult).to.be.true;
         });
 
-        it('should fail because there is one common element ', () => {
+        it('should contain a common element ', () => {
             const groups= ['young', 'single', 'poor'];
             const arrayContainsOneResult = arrayContainsNone(groups, ['young','parent']);
             expect(arrayContainsOneResult).to.be.false;

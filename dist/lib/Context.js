@@ -14,7 +14,6 @@ class Context {
         return this._main;
     }
     addGroup(groupId) {
-        console.log('adding ' + groupId);
         this.groups.push(groupId);
         return this;
     }

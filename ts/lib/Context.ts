@@ -21,7 +21,6 @@ class Context implements IContext {
     }
 
     public addGroup(groupId: string): Context {
-        console.log('adding ' + groupId);
         this.groups.push(groupId);
         return this;
     }
