@@ -1,6 +1,7 @@
 "use strict";
 const chai_1 = require('chai');
 const ModuleContextSelector_1 = require('../lib/ModuleContextSelector');
+const ArrayValidators_1 = require('../lib/ArrayValidators');
 const Context_1 = require('../lib/Context');
 describe('ModuleContext', () => {
     const moduleContext = {
@@ -25,36 +26,36 @@ describe('ModuleContext', () => {
     describe('arrayContainsOne', () => {
         it('should contain one entry', () => {
             const groups = ['young', 'poor', 'president'];
-            const arrayContainsOneResult = ModuleContextSelector_1.arrayContainsOne(groups, ['young']);
+            const arrayContainsOneResult = ArrayValidators_1.arrayContainsOne(groups, ['young']);
             chai_1.expect(arrayContainsOneResult).to.be.true;
         });
         it('should not contain any entries', () => {
             const groups = ['young', 'poor', 'president'];
-            const arrayContainsOneResult = ModuleContextSelector_1.arrayContainsOne(groups, ['old', 'rich', 'parent']);
+            const arrayContainsOneResult = ArrayValidators_1.arrayContainsOne(groups, ['old', 'rich', 'parent']);
             chai_1.expect(arrayContainsOneResult).to.be.false;
         });
     });
     describe('arrayContainsAll', () => {
         it('should pass containing all entries', () => {
             const groups = ['young', 'parent', 'rich'];
-            const arrayContainsOneResult = ModuleContextSelector_1.arrayContainsAll(groups, ['young', 'parent', 'rich']);
+            const arrayContainsOneResult = ArrayValidators_1.arrayContainsAll(groups, ['young', 'parent', 'rich']);
             chai_1.expect(arrayContainsOneResult).to.be.true;
         });
         it('shoul not contain all entries', () => {
             const groups = ['young'];
-            const arrayContainsOneResult = ModuleContextSelector_1.arrayContainsAll(groups, ['young', 'parent']);
+            const arrayContainsOneResult = ArrayValidators_1.arrayContainsAll(groups, ['young', 'parent']);
             chai_1.expect(arrayContainsOneResult).to.be.false;
         });
     });
     describe('arrayContainsNone', () => {
         it('should not contain any elements', () => {
             const groups = ['old', 'single', 'poor'];
-            const arrayContainsOneResult = ModuleContextSelector_1.arrayContainsNone(groups, ['young', 'parent', 'rich']);
+            const arrayContainsOneResult = ArrayValidators_1.arrayContainsNone(groups, ['young', 'parent', 'rich']);
             chai_1.expect(arrayContainsOneResult).to.be.true;
         });
         it('should contain a common element ', () => {
             const groups = ['young', 'single', 'poor'];
-            const arrayContainsOneResult = ModuleContextSelector_1.arrayContainsNone(groups, ['young', 'parent']);
+            const arrayContainsOneResult = ArrayValidators_1.arrayContainsNone(groups, ['young', 'parent']);
             chai_1.expect(arrayContainsOneResult).to.be.false;
         });
     });

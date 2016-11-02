@@ -1,5 +1,6 @@
 import { expect } from 'chai';
-import { load, findRule, mainValidator, groupValidator, arrayContainsOne, arrayContainsAll, arrayContainsNone } from '../lib/ModuleContextSelector';
+import { load, findRule, mainValidator, groupValidator } from '../lib/ModuleContextSelector';
+import { arrayContainsOne, arrayContainsAll, arrayContainsNone } from '../lib/ArrayValidators';
 import IModuleContext from '../lib/IModuleContext';
 import { IContext } from '../lib/IContext';
 import Context from '../lib/Context';
