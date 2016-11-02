@@ -1,6 +1,6 @@
 # Module context
 
-This module checks if a provided context matches a certain rule.
+This module checks if a provided context matches a certain rule. It's meant to help in the development of an A/B Testing system.
 
 ## Installation and testing
 
