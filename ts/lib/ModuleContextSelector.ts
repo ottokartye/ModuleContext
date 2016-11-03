@@ -7,6 +7,12 @@ import { arrayContainsNone, arrayContainsOne, arrayContainsAll } from './ArrayVa
 
 export module ModuleContextSelector {
 
+    /**
+     * Execute the provided context against the list of provided rules
+     * @param {IModuleContext[]} rules
+     * @param {IContext} context
+     * @returns {Promise<IModuleContext>}
+     */
     export function exec(rules: IModuleContext[], context: IContext): Promise<IModuleContext> {
         // Check if context matches any rule
         let selectedRule = findRule(rules, context);

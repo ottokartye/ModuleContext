@@ -3,6 +3,12 @@
 const ArrayValidators_1 = require('./ArrayValidators');
 var ModuleContextSelector;
 (function (ModuleContextSelector) {
+    /**
+     * Execute the provided context against the list of provided rules
+     * @param {IModuleContext[]} rules
+     * @param {IContext} context
+     * @returns {Promise<IModuleContext>}
+     */
     function exec(rules, context) {
         // Check if context matches any rule
         let selectedRule = findRule(rules, context);
