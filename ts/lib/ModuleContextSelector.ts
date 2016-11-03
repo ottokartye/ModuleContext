@@ -2,7 +2,6 @@
 
 import IModuleContext from './IModuleContext';
 import {IContext} from './IContext';
-import IModuleContextSelector from './IModuleContextSelector';
 import { arrayContainsNone, arrayContainsOne, arrayContainsAll } from './ArrayValidators';
 
 export module ModuleContextSelector {
