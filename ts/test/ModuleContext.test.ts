@@ -1,11 +1,15 @@
-import { expect } from 'chai';
-import ModuleContextSelector from '../lib/ModuleContextSelector';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+import { ModuleContextSelector } from '../lib/ModuleContextSelector';
 import { arrayContainsOne, arrayContainsAll, arrayContainsNone } from '../lib/ArrayValidators';
 import IModuleContext from '../lib/IModuleContext';
 import { IContext } from '../lib/IContext';
 import Context from '../lib/Context';
 
-describe('ModuleContext', () => {
+chai.use(chaiAsPromised);
+const expect = chai.expect;
+
+describe('Array validators', () => {
 
     // Testing array validations
     describe('arrayContainsOne', () => {
@@ -49,17 +53,19 @@ describe('ModuleContext', () => {
             expect(arrayContainsOneResult).to.be.false;
         });
     });
+});
+
+describe('ModuleContext', () => {
 
     // Sample context to check against ModuleContextSelector rules
     const context: IContext = new Context();
     context.setMain('male');
     context.addGroup('young').addGroup('parent').addGroup('rich');
 
-
-    describe('adding rules to moduleContextSelector', () => {
-        it('should add rules', () => {
+    describe('loading modules', () => {
+        it('should find a rule which matches the currently passed context and load the required module', () => {
             // Define new rules
-            const male: IModuleContext = {
+            const rules: IModuleContext[] = [{
                 main: 'male',
                 groups: {
                     one: ['parent'],
@@ -67,8 +73,8 @@ describe('ModuleContext', () => {
                     none: ['old']
                 },
                 module: ['SayHello']
-            };
-            const female: IModuleContext = {
+            },
+            {
                 main: 'female',
                 groups: {
                     one: ['parent'],
@@ -76,17 +82,18 @@ describe('ModuleContext', () => {
                     none: ['old']
                 },
                 module: ['sampleModuleName']
-            };
-            ModuleContextSelector.addRule(male).addRule(female);
-            const result = ModuleContextSelector.getNumberOfRules();
-            expect(result).to.be.equal(2);
-        });
-    });
+            }];
 
-    describe('loading modules', () => {
-        it('should find a rule which matches the currently passed context and load the required module', () => {
-            const result = ModuleContextSelector.load(context);
-            expect(result).to.be.true;
+            const result = ModuleContextSelector.exec(rules, context);
+            expect(result).to.eventually.be.eql({
+                main: 'male',
+                groups:
+                { 
+                    one: [ 'parent' ],
+                    all: [ 'young', 'parent', 'rich' ],
+                    none: [ 'old' ] },
+                    module: [ 'SayHello' ]
+                });
         })
     });
 });

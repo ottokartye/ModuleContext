@@ -5,24 +5,39 @@ import {IContext} from './IContext';
 import IModuleContextSelector from './IModuleContextSelector';
 import { arrayContainsNone, arrayContainsOne, arrayContainsAll } from './ArrayValidators';
 
-class ModuleContextSelector implements IModuleContextSelector {
-    private rules: IModuleContext[];
+export module ModuleContextSelector {
 
-    constructor() {
-        this.rules = [];
+    export function exec(rules: IModuleContext[], context: IContext): Promise<IModuleContext> {
+        // Check if context matches any rule
+        let selectedRule = findRule(rules, context);
+
+        if (!selectedRule) {
+            return;
+        }
+
+        // Load the module specified by the found rule (ModuleContext)
+        if (selectedRule.module) {
+            load(selectedRule, context);
+        }
+
+        return Promise.resolve(selectedRule);
     }
 
     /**
-     * Add a new rule (piping supported)
-     * @param  {IModuleContext} rule
-     * @returns IModuleContextSelector
+     * Check if provided context validates against the list of rules
+     * @param  {IModuleContext[]} rules
+     * @param  {IContext} context
+     * @returns IModuleContext
      */
-    public addRule(rule: IModuleContext): IModuleContextSelector {
-        if (rule) {
-            this.rules.push(rule);
-        }
+    function findRule(rules: IModuleContext[], context: IContext): IModuleContext {
 
-        return this;
+        return rules.find((rule) => {
+
+            let mainValidatorResult: boolean = mainValidator(rule, context);
+            let groupValidatorResult: boolean = groupValidator(rule, context);
+
+            return mainValidatorResult && groupValidatorResult;
+        });
     }
 
     /**
@@ -31,24 +46,17 @@ class ModuleContextSelector implements IModuleContextSelector {
      * @param  {IContext} context
      * @returns boolean
      */
-    public load(context: IContext): boolean {
-        // Check if context matches any rule
-        let selectedRule = this.findRule(this.rules, context);
-
-        if (!selectedRule) {
-            return false;
-        }
+    function load(rule: IModuleContext, context: IContext): boolean {
 
         // TODO: loading only module from current directory, check needed for existence of a module
-        let modules = require('./' + selectedRule.module);
+        let modules = require('./' + rule.module);
 
-        if (!!selectedRule.onLoadedModule) {
-            selectedRule.onLoadedModule.apply(selectedRule, modules);
+        if (!!rule.onLoadedModule) {
+            rule.onLoadedModule.apply(rule, modules);
         }
 
         return true;
     }
-
     
     /**
      * Check if main criteria matches against provided IModuleContext
@@ -56,7 +64,7 @@ class ModuleContextSelector implements IModuleContextSelector {
      * @param  {IContext} context
      * @returns boolean
      */
-    private mainValidator (rule: IModuleContext, context: IContext): boolean {
+    function mainValidator (rule: IModuleContext, context: IContext): boolean {
         let mainValidator: boolean = true;
 
         if (!!rule.main) {
@@ -77,7 +85,7 @@ class ModuleContextSelector implements IModuleContextSelector {
      * @param  {IContext} context
      * @returns boolean
      */
-    private groupValidator (rule: IModuleContext, context: IContext): boolean {
+    function groupValidator (rule: IModuleContext, context: IContext): boolean {
 
         if (!!rule.groups) {
                 
@@ -102,32 +110,4 @@ class ModuleContextSelector implements IModuleContextSelector {
         return true;
     }
 
-    /**
-     * Check if provided context validates against the list of rules
-     * @param  {IModuleContext[]} rules
-     * @param  {IContext} context
-     * @returns IModuleContext
-     */
-    private findRule(rules: IModuleContext[], context: IContext): IModuleContext {
-
-        return rules.find((rule) => {
-
-            let mainValidatorResult: boolean = this.mainValidator(rule, context);
-            let groupValidatorResult: boolean = this.groupValidator(rule, context);
-
-            return mainValidatorResult && groupValidatorResult;
-        });
-    }
-
-    /**
-     * Only for testing!
-     * Return total number of rules
-     * @returns number
-     */
-    public getNumberOfRules(): number {
-        return this.rules.length;
-    }
 }
-
-var moduleContextSelector = new ModuleContextSelector;
-export default moduleContextSelector;

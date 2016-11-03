@@ -4,6 +4,7 @@
     "require": "registry:dt/require#2.1.20+20160919185614"
   },
   "dependencies": {
-    "chai": "registry:npm/chai#3.5.0+20160723033700"
+    "chai": "registry:npm/chai#3.5.0+20160723033700",
+    "chai-as-promised": "registry:npm/chai-as-promised#5.1.0+20160310030142"
   }
 }
